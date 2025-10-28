@@ -1,0 +1,11 @@
+<% if (user) { %>
+
+<a href="/auth/sign-out">Sign out</a>
+<h1>Welcome to the auth app <%= user.username %></h1>
+
+<% } else { %>
+
+<a href="/auth/sign-up">Sign Up</a>
+<a href="/auth/sign-in">Sign in</a>
+
+<% } %>
