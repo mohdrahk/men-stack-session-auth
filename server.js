@@ -1,38 +1,44 @@
-//Setting config files------------------------------------------------------------------
+// Dependencies ----------
+
 const dotenv = require("dotenv")
 dotenv.config()
+
 const express = require("express")
 const app = express()
-const methodOverride = require("method-override")
-const morgan = require("morgan")
+// app.set("view-engine", "ejs")
 
-// Connect server --------------------------------------------------------------------
-const mongoose = require("./config/db")
+// Database Connection
 
-// Set the port from environment variable or default to 3000
+const mongoose = require("./config/db.js")
+
+// Port Config ----------
+
 const port = process.env.PORT ? process.env.PORT : "3000"
 
-// Middleware ------------------------------------------------------------------------
+// Added for CSS
+const path = require("path")
 
-// Middleware to parse URL-encoded data from forms
-app.use(express.urlencoded({ extended: false }))
+// Required Middlewares
 
-// Middleware for using HTTP verbs such as PUT or DELETE
+const methodOverride = require("method-override")
+const morgan = require("morgan") // morgan is for logging only
+
+const session = require("express-session")
+const passUserToView = require("./middleware/pass-user-to-view") // checks for session
+const isSignedIn = require("./middleware/is-signed-in") // comment here
+
+// Running Middlewares
+
+app.use(express.urlencoded()) // for forms to submit data
 app.use(methodOverride("_method"))
-
-// Morgan for logging HTTP requests
 app.use(morgan("dev"))
 
-// Config for express session which is for login ORDER MATTERS HERE (We need to do our session config before the routes)
-const session = require("express-session")
+//new code Add for CSS
+app.use(express.static(path.join(__dirname, "public")))
+//new code above this line ---
 
-//// Pass user to views middleware, has to come after session configuration
-const passUserToView = require("./middleware/pass-user-to-view")
+// Session Configuration (MUST be before all routes)
 
-//Is signed user to manage permission, this is const, but when we use app.use, position will matter
-const isSignedIn = require("./middleware/is-signed-in")
-
-// Session Configuration
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -41,31 +47,37 @@ app.use(
   })
 )
 
-// Using the pass user, MUST BE UNDER server configuration
-
 app.use(passUserToView)
 
-// Routes ------------------------------------------------------------------------------
+// Root Route
 
-// Routes that use GET
 app.get("/", async (req, res) => {
-  res.render("index.ejs")
+  // console.log(req.session.user.username)
+  user = req.session.user
+  if (user) {
+    username = req.session.user.username
+  } else {
+    username = "Guest"
+  }
+  res.render("index.ejs", { username })
 })
 
-// Require Routes
-const authRouter = require("./routes/auth.js")
+app.get("/vip-lounge", isSignedIn, (req, res) => {
+  res.send(`Welcome to the party, ${req.session.user.username}`)
+})
 
-// //Check middle ware of is signed in
-// app.get("auth/vip-lounge", isSignedIn, (req, res) => {
-//   // res.send(`welcome to the party! ${req.session.user.username}`)
-//   res.render("vip-lounge.ejs")
-// })
+// Required Routes
 
-// Use routes
+const authRouter = require("./routes/auth")
+const taskRouter = require("./routes/tasks")
+
+// Use Routes
+
 app.use("/auth", authRouter)
+app.use("/tasks", isSignedIn, taskRouter) // isSignedIn is a middleware checking... you guessed it
 
-// ---------------------------------------------------------------------------------------
+// Server - Listen on configured port
 
 app.listen(port, () => {
-  console.log(`The express app is ready on port ${port}!`)
+  console.log(`The Express app iis listening on port ${port}`)
 })

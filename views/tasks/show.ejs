@@ -1,0 +1,15 @@
+<%- include('../partials/_navbar.ejs') %>
+<h1>
+  <%= task.title %></h1>
+  <h2>Details</h2>
+  <p><strong>Description:</strong> <%= task.description %></p>
+  <p><strong>Due Date:</strong> <%= task.dueDate.toDateString() %></p>
+  <p><strong>Priority:</strong> <%= task.priority %></p>
+  <p><strong>Status:</strong> <%= task.status %></p>
+
+  <h2>Actions</h2>
+  <a href="/tasks/<%= task._id %>/edit">Edit this task</a>
+  <form action="/tasks/<%= task._id %>?_method=DELETE" method="POST">
+    <button type="submit">Delete this task</button>
+  </form>
+</>

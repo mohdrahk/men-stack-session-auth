@@ -17,7 +17,15 @@
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "method-override": "^3.0.0",
-    "mongoose": "^8.19.2",
+    "mongoose": "^8.19.3",
     "morgan": "^1.10.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohdrahk/men-stack-session-auth.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mohdrahk/men-stack-session-auth/issues"
+  },
+  "homepage": "https://github.com/mohdrahk/men-stack-session-auth#readme"
 }

@@ -1,0 +1,10 @@
+<%- include("../partials/_navbar.ejs") %>
+<h1><%= user.username %> Tasks</h1>
+<ul>
+  <% tasks.forEach(task => { %>
+  <li>
+    <strong><%= task.title %></strong> - <%= task.status %>
+    <a href="/tasks/<%= task._id %>">View Details</a>
+  </li>
+  <% }) %>
+</ul>
